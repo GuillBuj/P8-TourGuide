@@ -48,23 +48,23 @@
 		</dependency>
 
 		<dependency>
-			<groupId>gpsUtil</groupId>
+			<groupId>local.lib</groupId>
 			<artifactId>gpsUtil</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>tripPricer</groupId>
-			<artifactId>tripPricer</artifactId>
+			<groupId>local.lib</groupId>
+			<artifactId>RewardCentral</artifactId>
 			<version>1.0.0</version>
 		</dependency>
 
 		<dependency>
-			<groupId>rewardCentral</groupId>
-			<artifactId>rewardCentral</artifactId>
+			<groupId>local.lib</groupId>
+			<artifactId>TripPricer</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-	</dependencies>
+		</dependencies>
 
 	<build>
 		<plugins>
