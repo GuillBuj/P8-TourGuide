@@ -1,27 +1,31 @@
-# Script simplifié pour installer les JARs dans Maven
+# Script simplifié pour installer les JARs dans Maven (avec chemins relatifs)
 
-# Définir les chemins des fichiers JAR
+# Chemin de base relatif (ici : dossier "libs" dans le dossier courant)
+$basePath = Join-Path -Path (Get-Location) -ChildPath "libs"
+
+# Définir les fichiers JAR avec leurs métadonnées
 $jarFiles = @(
-    @{file = "C:\Users\gbujon\Desktop\P8-TourGuide\TourGuide\libs\gpsUtil.jar"; groupId = "local.lib"; artifactId = "gpsUtil"; version = "1.0.0"},
-    @{file = "C:\Users\gbujon\Desktop\P8-TourGuide\TourGuide\libs\RewardCentral.jar"; groupId = "local.lib"; artifactId = "RewardCentral"; version = "1.0.0"},
-    @{file = "C:\Users\gbujon\Desktop\P8-TourGuide\TourGuide\libs\TripPricer.jar"; groupId = "local.lib"; artifactId = "TripPricer"; version = "1.0.0"}
+    @{file = "gpsUtil.jar"; groupId = "local.lib"; artifactId = "gpsUtil"; version = "1.0.0"},
+    @{file = "RewardCentral.jar"; groupId = "local.lib"; artifactId = "RewardCentral"; version = "1.0.0"},
+    @{file = "TripPricer.jar"; groupId = "local.lib"; artifactId = "TripPricer"; version = "1.0.0"}
 )
 
 Write-Host "Début de l'installation des dépendances Maven"
 
 foreach ($jar in $jarFiles) {
+    $fullPath = Join-Path -Path $basePath -ChildPath $jar.file
     Write-Host "Installation de $($jar.artifactId)-$($jar.version)..."
-    
-    if (Test-Path $jar.file) {
+
+    if (Test-Path $fullPath) {
         $mvnCommand = "mvn install:install-file " +
-                      "-Dfile=`"$($jar.file)`" " +
+                      "-Dfile=`"$fullPath`" " +
                       "-DgroupId=`"$($jar.groupId)`" " +
                       "-DartifactId=`"$($jar.artifactId)`" " +
                       "-Dversion=`"$($jar.version)`" " +
                       "-Dpackaging=jar"
 
         Write-Host "Commande: $mvnCommand"
-        
+
         Invoke-Expression $mvnCommand
 
         if ($LASTEXITCODE -eq 0) {
@@ -30,9 +34,9 @@ foreach ($jar in $jarFiles) {
             Write-Host "Erreur lors de l'installation de $($jar.artifactId)"
         }
     } else {
-        Write-Host "Fichier introuvable: $($jar.file)"
+        Write-Host "Fichier introuvable: $fullPath"
     }
-    Write-Host ""
+    Write-host ""
 }
 
 Write-Host "Opération terminée"
