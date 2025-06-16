@@ -1,0 +1,7 @@
+PS C:\Users\gbujon\Desktop\work\P8-TourGuide> git checkout --orphan gh-pages
+Switched to a new branch 'gh-pages'
+PS C:\Users\gbujon\Desktop\work\P8-TourGuide> git rm -rf .
+fatal: pathspec '.' did not match any files
+PS C:\Users\gbujon\Desktop\work\P8-TourGuide> git commit --allow-empty -m "init"
+[gh-pages (root-commit) 8b85b60] init
+PS C:\Users\gbujon\Desktop\work\P8-TourGuide> git push --set-upstream origin gh-pages

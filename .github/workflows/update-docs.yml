@@ -1,0 +1,98 @@
+name: Update docs
+
+on:
+  workflow_run:
+    workflows: ["Java CI with Maven"]
+    types:
+      - completed
+    branches: [main, dev]
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  deploy-docs:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Create docs structure if not exists
+        run: |
+          mkdir -p jacoco/
+          mkdir -p surefire/
+          mkdir -p javadoc/
+
+      - name: Download artifacts from workflow (jacoco)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: jacoco-report
+          path: ./temp-jacoco
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download artifacts from workflow (surefire)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: surefire-report
+          path: ./temp-surefire
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Download artifacts from workflow (javadoc)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: javadoc
+          path: ./temp-javadoc
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Deploy documentation
+        run: |
+          if [ -d "./temp-jacoco" ]; then
+            rm -rf jacoco/*
+            cp -r ./temp-jacoco/* jacoco/
+          fi
+
+          if [ -d "./temp-surefire" ]; then
+            rm -rf surefire/*
+            cp -r ./temp-surefire/* surefire/
+          fi
+
+          if [ -d "./temp-javadoc" ]; then
+            rm -rf javadoc/*
+            cp -r ./temp-javadoc/* javadoc/
+          fi
+          echo "après les if"
+          rm -rf ./temp-jacoco
+          rm -rf ./temp-surefire
+          rm -rf ./temp-javadoc
+
+      - name: Commit and push to gh-pages
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add .
+
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📚 Update documentation - $(date)"
+            git push origin gh-pages
+            echo "✅ Documentation deployed to GitHub Pages"
+          fi
