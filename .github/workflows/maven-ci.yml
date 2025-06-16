@@ -20,10 +20,35 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Cache Maven packages
-        uses: actions/cache@v4
+      - name: Install dependencies
+        run: |
+            mvn install:install-file -Dfile=libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=gpsUtil -Dversion=1.0.0 -Dpackaging=jar
+            mvn install:install-file -Dfile=libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
+            mvn install:install-file -Dfile=libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
+
+      - name: Build and test with Maven (using JaCoCo and Surefire)
+        run: mvn clean verify jacoco:report surefire-report:report-only javadoc:javadoc
+
+      - name: Upload JaCoCo Report
+        uses: actions/upload-artifact@v4
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          name: jacoco-report
+          path: target/site/jacoco/
+
+      - name: Upload Javadoc
+        uses: actions/upload-artifact@v4
+        with:
+          name: javadoc
+          path: target/site/apidocs/
+
+      - name: Upload Surefire Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-report
+          path: target/reports/
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/*.jar
