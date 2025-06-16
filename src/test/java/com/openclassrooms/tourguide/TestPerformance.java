@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import gpsUtil.GpsUtil;
@@ -91,12 +90,12 @@ public class TestPerformance {
 		allUsers = tourGuideService.getAllUsers();
 		allUsers.forEach(u -> u.addToVisitedLocations(new VisitedLocation(u.getUserId(), attraction, new Date())));
 
-		allUsers.forEach(u -> rewardsService.calculateRewards(u));
+		allUsers.forEach(u -> rewardsService.calculateRewardsAsync(u));
 
 
 		//bloc ajouté au test pour attendre et éviter un assert raté par la suite
 		List<CompletableFuture<Void>> futures = allUsers.stream()
-				.map(rewardsService::calculateRewards)
+				.map(rewardsService::calculateRewardsAsync)
 				.toList();
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 

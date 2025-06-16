@@ -1,9 +1,7 @@
 package com.openclassrooms.tourguide.user;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
@@ -14,8 +12,8 @@ public class User {
 	private String phoneNumber;
 	private String emailAddress;
 	private Date latestLocationTimestamp;
-	private List<VisitedLocation> visitedLocations = new ArrayList<>();
-	private List<UserReward> userRewards = new ArrayList<>();
+	private List<VisitedLocation> visitedLocations = new CopyOnWriteArrayList<>();
+	private final List<UserReward> userRewards = new ArrayList<>();
 	private UserPreferences userPreferences = new UserPreferences();
 	private List<Provider> tripDeals = new ArrayList<>();
 	public User(UUID userId, String userName, String phoneNumber, String emailAddress) {
@@ -69,14 +67,30 @@ public class User {
 		visitedLocations.clear();
 	}
 	
-	public void addUserReward(UserReward userReward) {
-		if(userRewards.stream().filter(r -> !r.attraction.attractionName.equals(userReward.attraction)).count() == 0) {
-			userRewards.add(userReward);
+//	public void addUserReward(UserReward userReward) {
+//		boolean alreadyExists = userRewards.stream()
+//				.anyMatch(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName));
+//
+//		if (!alreadyExists) {
+//			userRewards.add(userReward);
+//		}
+//	}
+
+	public synchronized void addUserReward(UserReward reward) {
+		if (userRewards.stream().noneMatch(r ->
+				r.attraction.attractionName.equals(reward.attraction.attractionName))) {
+			userRewards.add(reward);
 		}
 	}
-	
+
+//	public List<UserReward> getUserRewards() {
+//		return userRewards;
+//	}
+
 	public List<UserReward> getUserRewards() {
-		return userRewards;
+		synchronized(userRewards) {
+			return new ArrayList<>(userRewards);
+		}
 	}
 	
 	public UserPreferences getUserPreferences() {
