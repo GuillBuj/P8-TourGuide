@@ -67,25 +67,12 @@ public class User {
 		visitedLocations.clear();
 	}
 	
-//	public void addUserReward(UserReward userReward) {
-//		boolean alreadyExists = userRewards.stream()
-//				.anyMatch(r -> r.attraction.attractionName.equals(userReward.attraction.attractionName));
-//
-//		if (!alreadyExists) {
-//			userRewards.add(userReward);
-//		}
-//	}
-
 	public synchronized void addUserReward(UserReward reward) {
 		if (userRewards.stream().noneMatch(r ->
 				r.attraction.attractionName.equals(reward.attraction.attractionName))) {
 			userRewards.add(reward);
 		}
 	}
-
-//	public List<UserReward> getUserRewards() {
-//		return userRewards;
-//	}
 
 	public List<UserReward> getUserRewards() {
 		synchronized(userRewards) {

@@ -27,7 +27,6 @@ public class RewardsService {
 	private final RewardCentral rewardsCentral;
 
 	private final ExecutorService executorService = Executors.newFixedThreadPool(100);
-//	private final ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 15);
 
 	public RewardsService(GpsUtil gpsUtil, RewardCentral rewardCentral) {
 		this.gpsUtil = gpsUtil;
@@ -56,33 +55,6 @@ public class RewardsService {
 			}
 		}
 	}
-
-//	public CompletableFuture<Void> calculateRewardsAsync(User user) {
-//		List<VisitedLocation> visitedLocations = user.getVisitedLocations();
-//		List<Attraction> allAttractions = gpsUtil.getAttractions();
-//
-//		Set<String> alreadyAwardedAttractions = user.getUserRewards().stream()
-//				.map(r -> r.attraction.attractionName)
-//				.collect(Collectors.toSet());
-//
-//		List<CompletableFuture<Void>> rewardTasks = visitedLocations.stream()
-//				.flatMap(visited -> allAttractions.stream()
-//						.filter(attraction -> !alreadyAwardedAttractions.contains(attraction.attractionName))
-//						.filter(attraction -> nearAttraction(visited, attraction))
-//						.map(attraction -> CompletableFuture.runAsync(() -> {
-//							int rewardPoints = getRewardPoints(attraction, user);
-//							synchronized (user) {
-//								user.addUserReward(new UserReward(visited, attraction, rewardPoints));
-//							}
-//						}, executorService)))
-//				.toList();
-//
-//		return CompletableFuture.allOf(rewardTasks.toArray(new CompletableFuture[0]));
-//	}
-
-	private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 4;
-	private static final Semaphore semaphore = new Semaphore(MAX_THREADS);
-	private static final ExecutorService executor = Executors.newCachedThreadPool();
 
 	public CompletableFuture<Void> calculateRewardsAsync(User user) {
 		return CompletableFuture.runAsync(() -> {
