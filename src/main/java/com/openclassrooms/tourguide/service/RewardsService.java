@@ -42,21 +42,6 @@ public class RewardsService {
 		proximityBuffer = defaultProximityBuffer;
 	}
 
-//	public void calculateRewards(User user) {
-//		List<VisitedLocation> userLocations = user.getVisitedLocations();
-//		List<Attraction> attractions = gpsUtil.getAttractions();
-//
-//		for (VisitedLocation visitedLocation : userLocations) {
-//			for (Attraction attraction : attractions) {
-//				if (nearAttraction(visitedLocation, attraction)) {
-//					int rewardPoints = getRewardPoints(attraction, user);
-//					UserReward reward = new UserReward(visitedLocation, attraction, rewardPoints);
-//					user.addUserReward(reward);
-//				}
-//			}
-//		}
-//	}
-
 	public void calculateRewards(User user) {
 		List<VisitedLocation> userLocations = user.getVisitedLocations();
 		List<Attraction> attractions = gpsUtil.getAttractions();
@@ -72,60 +57,38 @@ public class RewardsService {
 		}
 	}
 
-	public CompletableFuture<Void> calculateRewardsAsync(User user) {
-		List<VisitedLocation> visitedLocations = user.getVisitedLocations();
-		List<Attraction> allAttractions = gpsUtil.getAttractions();
-
-		Set<String> alreadyAwardedAttractions = user.getUserRewards().stream()
-				.map(r -> r.attraction.attractionName)
-				.collect(Collectors.toSet());
-
-		List<CompletableFuture<Void>> rewardTasks = visitedLocations.stream()
-				.flatMap(visited -> allAttractions.stream()
-						.filter(attraction -> !alreadyAwardedAttractions.contains(attraction.attractionName))
-						.filter(attraction -> nearAttraction(visited, attraction))
-						.map(attraction -> CompletableFuture.runAsync(() -> {
-							int rewardPoints = getRewardPoints(attraction, user);
-							synchronized (user) {
-								user.addUserReward(new UserReward(visited, attraction, rewardPoints));
-							}
-						}, executorService)))
-				.toList();
-
-		return CompletableFuture.allOf(rewardTasks.toArray(new CompletableFuture[0]));
-	}
-
-//	public CompletableFuture<Void> calculateRewards(User user) {
-//		// 1. Copie thread-safe des données
-//		List<VisitedLocation> visitedLocations = new ArrayList<>(user.getVisitedLocations());
-//		List<Attraction> attractions = new ArrayList<>(gpsUtil.getAttractions());
-//		Set<String> awardedAttractions = new ConcurrentHas;
-//		user.getUserRewards().forEach(r -> awardedAttractions.add(r.attraction.attractionName));
+//	public CompletableFuture<Void> calculateRewardsAsync(User user) {
+//		List<VisitedLocation> visitedLocations = user.getVisitedLocations();
+//		List<Attraction> allAttractions = gpsUtil.getAttractions();
 //
-//		// 2. Génération des tâches
-//		List<CompletableFuture<Void>> tasks = new ArrayList<>();
+//		Set<String> alreadyAwardedAttractions = user.getUserRewards().stream()
+//				.map(r -> r.attraction.attractionName)
+//				.collect(Collectors.toSet());
 //
-//		visitedLocations.forEach(visited -> {
-//			attractions.stream()
-//					.filter(attraction -> !awardedAttractions.contains(attraction.attractionName))
-//					.filter(attraction -> nearAttraction(visited, attraction))
-//					.forEach(attraction -> {
-//						tasks.add(CompletableFuture.runAsync(() -> {
-//							int points = getRewardPoints(attraction, user);
-//							UserReward reward = new UserReward(visited, attraction, points);
-//
-//							synchronized(user.getUserRewards()) {
-//								if(user.getUserRewards().stream().noneMatch(r ->
-//										r.attraction.equals(reward.attraction))) {
-//									user.getUserRewards().add(reward);
-//								}
+//		List<CompletableFuture<Void>> rewardTasks = visitedLocations.stream()
+//				.flatMap(visited -> allAttractions.stream()
+//						.filter(attraction -> !alreadyAwardedAttractions.contains(attraction.attractionName))
+//						.filter(attraction -> nearAttraction(visited, attraction))
+//						.map(attraction -> CompletableFuture.runAsync(() -> {
+//							int rewardPoints = getRewardPoints(attraction, user);
+//							synchronized (user) {
+//								user.addUserReward(new UserReward(visited, attraction, rewardPoints));
 //							}
-//						}, executorService));
-//					});
-//		});
+//						}, executorService)))
+//				.toList();
 //
-//		return CompletableFuture.allOf(tasks.toArray(new CompletableFuture[0]));
+//		return CompletableFuture.allOf(rewardTasks.toArray(new CompletableFuture[0]));
 //	}
+
+	private static final int MAX_THREADS = Runtime.getRuntime().availableProcessors() * 4;
+	private static final Semaphore semaphore = new Semaphore(MAX_THREADS);
+	private static final ExecutorService executor = Executors.newCachedThreadPool();
+
+	public CompletableFuture<Void> calculateRewardsAsync(User user) {
+		return CompletableFuture.runAsync(() -> {
+			calculateRewards(user);
+		}, executorService);
+	}
 
 	public void shutdown() {
 		executorService.shutdown();
