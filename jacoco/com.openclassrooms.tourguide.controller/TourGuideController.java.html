@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TourGuideController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tourguide</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.tourguide</a> &gt; <span class="el_source">TourGuideController.java</span></div><h1>TourGuideController.java</h1><pre class="source lang-java linenums">package com.openclassrooms.tourguide;
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TourGuideController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tourguide</a> &gt; <a href="index.source.html" class="el_package">com.openclassrooms.tourguide.controller</a> &gt; <span class="el_source">TourGuideController.java</span></div><h1>TourGuideController.java</h1><pre class="source lang-java linenums">package com.openclassrooms.tourguide.controller;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import gpsUtil.location.Attraction;
 import gpsUtil.location.VisitedLocation;
 
 import com.openclassrooms.tourguide.service.TourGuideService;
@@ -18,19 +17,19 @@ import com.openclassrooms.tourguide.user.UserReward;
 import tripPricer.Provider;
 
 @RestController
-<span class="fc" id="L21">public class TourGuideController {</span>
+<span class="fc" id="L20">public class TourGuideController {</span>
 
 	@Autowired
 	TourGuideService tourGuideService;
 	
     @RequestMapping(&quot;/&quot;)
     public String index() {
-<span class="nc" id="L28">        return &quot;Greetings from TourGuide!&quot;;</span>
+<span class="nc" id="L27">        return &quot;Greetings from TourGuide!&quot;;</span>
     }
     
     @RequestMapping(&quot;/getLocation&quot;) 
     public VisitedLocation getLocation(@RequestParam String userName) {
-<span class="nc" id="L33">    	return tourGuideService.getUserLocation(getUser(userName));</span>
+<span class="nc" id="L32">    	return tourGuideService.getUserLocation(getUser(userName));</span>
     }
     
     //  TODO: Change this method to no longer return a List of Attractions.
@@ -44,23 +43,23 @@ import tripPricer.Provider;
         //    Note: Attraction reward points can be gathered from RewardsCentral
     @RequestMapping(&quot;/getNearbyAttractions&quot;) 
     public List&lt;NearbyAttractionDTO&gt; getNearbyAttractions(@RequestParam String userName) {
-<span class="nc" id="L47">    	User user = getUser(userName);</span>
-<span class="nc" id="L48">        VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));</span>
-<span class="nc" id="L49">    	return tourGuideService.getNearByAttractions(visitedLocation, user);</span>
+<span class="nc" id="L46">    	User user = getUser(userName);</span>
+<span class="nc" id="L47">        VisitedLocation visitedLocation = tourGuideService.getUserLocation(getUser(userName));</span>
+<span class="nc" id="L48">    	return tourGuideService.getNearByAttractions(visitedLocation, user);</span>
     }
     
     @RequestMapping(&quot;/getRewards&quot;) 
     public List&lt;UserReward&gt; getRewards(@RequestParam String userName) {
-<span class="nc" id="L54">    	return tourGuideService.getUserRewards(getUser(userName));</span>
+<span class="nc" id="L53">    	return tourGuideService.getUserRewards(getUser(userName));</span>
     }
        
     @RequestMapping(&quot;/getTripDeals&quot;)
     public List&lt;Provider&gt; getTripDeals(@RequestParam String userName) {
-<span class="nc" id="L59">    	return tourGuideService.getTripDeals(getUser(userName));</span>
+<span class="nc" id="L58">    	return tourGuideService.getTripDeals(getUser(userName));</span>
     }
     
     private User getUser(String userName) {
-<span class="nc" id="L63">    	return tourGuideService.getUser(userName);</span>
+<span class="nc" id="L62">    	return tourGuideService.getUser(userName);</span>
     }
    
 
