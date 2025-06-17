@@ -9,7 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      LC_ALL: en_US.UTF-8
+      LANG: en_US.UTF-8
+      MAVEN_OPTS: "-Duser.language=en -Duser.country=US"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
