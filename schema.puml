@@ -1,0 +1,37 @@
+@startuml
+title TourGuide - Component Diagram (Updated)
+
+package "TourGuide Application" {
+  component "TourGuideController" <<Controller>>
+  component "TourGuideService" <<Service>>
+  component "RewardsService" <<Service>>
+  component "Tracker" <<Thread/Task>>
+  component "User" <<Entity>>
+  component "UserReward" <<Entity>>
+  component "UserPreferences" <<Entity>>
+}
+
+package "External Libraries" {
+  component "gpsUtil" <<Library>>
+  component "TripPricer" <<Library>>
+  component "RewardCentral" <<Library>>
+}
+
+TourGuideController --> TourGuideService : calls
+
+TourGuideService --> gpsUtil : getUserLocation()
+TourGuideService --> TripPricer : getPrice()
+TourGuideService --> Tracker : startTracking()
+TourGuideService --> RewardsService : calculateRewards()
+
+RewardsService --> RewardCentral : getAttractionRewardPoints()
+RewardsService --> gpsUtil : getAttractions()
+
+TourGuideService --> User : getAllUsers()
+TourGuideService --> UserReward : add/view
+User --> UserPreferences : contains
+User --> UserReward : has List<>
+
+Tracker --> TourGuideService : trackUserLocation(user)
+
+@enduml
