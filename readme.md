@@ -54,11 +54,11 @@ mvn install:install-file -Dfile=libs/TripPricer.jar -DgroupId=tripPricer -Dartif
 git clone https://github.com/GuillBuj/P8-TourGuide.git
 cd P8-TourGuide
 ````
-# Build project and skip tests if needed
+## Build project and skip tests if needed
 ````
 mvn clean package -DskipTests
 ````
-# Launch the app
+## Launch the app
 ````
 java -jar target/TourGuide-1.0-SNAPSHOT.jar
 ````
