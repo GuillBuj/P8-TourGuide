@@ -47,37 +47,58 @@ mvn install:install-file -Dfile=libs/gpsUtil.jar -DgroupId=gpsUtil -DartifactId=
 mvn install:install-file -Dfile=libs/RewardCentral.jar -DgroupId=rewardCentral -DartifactId=rewardCentral -Dversion=1.0.0 -Dpackaging=jar
 
 mvn install:install-file -Dfile=libs/TripPricer.jar -DgroupId=tripPricer -DartifactId=tripPricer -Dversion=1.0.0 -Dpackaging=jar
-🧪 Running Locally
-bash
+```
 
+## 🧪 Running Locally
+````
 git clone https://github.com/GuillBuj/P8-TourGuide.git
 cd P8-TourGuide
-
+````
 # Build project and skip tests if needed
+````
 mvn clean package -DskipTests
-
+````
 # Launch the app
+````
 java -jar target/TourGuide-1.0-SNAPSHOT.jar
-📁 Project Structure
+````
 
-🔄 CI/CD Automation
-GitHub Actions automatically handles:
+## 🔄 CI/CD Workflows
 
-✅ Code compilation and unit testing
+### 1. **Build & Test Workflow** (`maven-ci.yml`)
 
-🧪 Code coverage (JaCoCo) and test reports (Surefire)
+Triggered on every push/pull request to `dev` branch:
 
-📚 Javadoc generation
+✅ **Build Steps**:
+- Installs JDK 17
+- Caches Maven dependencies
+- Installs local JAR dependencies (gpsUtil, RewardCentral, TripPricer)
+- Runs Maven build with tests
+- Generates reports (JaCoCo, Surefire, Javadoc)
+- Uploads artifacts for deployment
 
-📦 .jar packaging and publishing to GitHub Releases
+📌 **Artifacts Produced**:
+- Application JAR file
+- Test coverage reports
+- Unit test results
+- Javadoc documentation
 
-🌐 Deployment to GitHub Pages (gh-pages branch)
+---
+
+### 2. **Documentation Update Workflow** (`update-docs.yml`)
+
+Triggered after successful completion of build workflow:
+
+🌐 **Deployment Steps**:
+- Checks out `gh-pages` branch
+- Downloads artifacts from build workflow
+- Updates documentation files:
+  - JaCoCo coverage reports
+  - Surefire test reports
+  - Javadoc API documentation
+- Automatically commits and pushes changes
 
 ## 📁 Project Structure
-
-<details>
-<summary>Click to expand full file structure</summary>
-
 ```plaintext
 src
 ├───main
