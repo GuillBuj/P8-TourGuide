@@ -15,7 +15,6 @@ package "TourGuide\nAPI" {
     package "«Service»" {
         [TourGuideService]
         [RewardService]
-        [UserService]
     }
 
     package "«Model»" {
@@ -39,7 +38,6 @@ package "«librairie»" {
 
 [TourGuide Controller] --> [TourGuideService]
 [TourGuide Controller] --> [RewardService]
-[TourGuide Controller] --> [UserService]
 
 [TourGuide\nAPI] ..> [gpsUtil] : Use
 [TourGuide\nAPI] ..> [RewardCentral] : Use
