@@ -1,37 +1,50 @@
 @startuml
-title TourGuide - Component Diagram (Updated)
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
 
-package "TourGuide Application" {
-  component "TourGuideController" <<Controller>>
-  component "TourGuideService" <<Service>>
-  component "RewardsService" <<Service>>
-  component "Tracker" <<Thread/Task>>
-  component "User" <<Entity>>
-  component "UserReward" <<Entity>>
-  component "UserPreferences" <<Entity>>
+' Client web
+package "«Client»" {
+    [Application web]
 }
 
-package "External Libraries" {
-  component "gpsUtil" <<Library>>
-  component "TripPricer" <<Library>>
-  component "RewardCentral" <<Library>>
+' TourGuide API
+package "TourGuide\nAPI" {
+
+    [TourGuide Controller]
+
+    package "«Service»" {
+        [TourGuideService]
+        [RewardService]
+        [UserService]
+    }
+
+    package "«Model»" {
+    }
 }
 
-TourGuideController --> TourGuideService : calls
+' Util
+package "«Util»" {
+}
 
-TourGuideService --> gpsUtil : getUserLocation()
-TourGuideService --> TripPricer : getPrice()
-TourGuideService --> Tracker : startTracking()
-TourGuideService --> RewardsService : calculateRewards()
+' Librairies
+package "«librairie»" {
+    [gpsUtil]
+    [RewardCentral]
+    [TripPricer]
+}
 
-RewardsService --> RewardCentral : getAttractionRewardPoints()
-RewardsService --> gpsUtil : getAttractions()
 
-TourGuideService --> User : getAllUsers()
-TourGuideService --> UserReward : add/view
-User --> UserPreferences : contains
-User --> UserReward : has List<>
+' Relations
+[Application web] --> [TourGuide Controller] : requêtes\nHTTP
 
-Tracker --> TourGuideService : trackUserLocation(user)
+[TourGuide Controller] --> [TourGuideService]
+[TourGuide Controller] --> [RewardService]
+[TourGuide Controller] --> [UserService]
+
+[TourGuide\nAPI] ..> [gpsUtil] : Use
+[TourGuide\nAPI] ..> [RewardCentral] : Use
+[TourGuide\nAPI] ..> [TripPricer] : Use
+[Service] <--> [Model]
+[TourGuideService] ..> [«Util»]
 
 @enduml
