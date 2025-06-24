@@ -77,7 +77,7 @@ jobs:
             rm -rf javadoc/*
             cp -r ./temp-javadoc/* javadoc/
           fi
-          echo "après les if"
+          
           rm -rf ./temp-jacoco
           rm -rf ./temp-surefire
           rm -rf ./temp-javadoc

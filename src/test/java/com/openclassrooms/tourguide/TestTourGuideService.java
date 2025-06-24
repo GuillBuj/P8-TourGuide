@@ -104,14 +104,13 @@ public class TestTourGuideService {
 		User user = new User(UUID.randomUUID(), "jon", "000", "jon@tourGuide.com");
 		VisitedLocation visitedLocation = tourGuideService.trackUserLocation(user);
 
-		//List<Attraction> attractions = tourGuideService.getNearByAttractions(visitedLocation);
 		List<NearbyAttractionDTO> nearbyAttractionDTOList = tourGuideService.getNearByAttractions(visitedLocation, user);
 
 		tourGuideService.tracker.stopTracking();
 
 		assertEquals(5, nearbyAttractionDTOList.size());
 	}
-	//TODO???
+
 	public void getTripDeals() {
 		GpsUtil gpsUtil = new GpsUtil();
 		RewardsService rewardsService = new RewardsService(gpsUtil, new RewardCentral());

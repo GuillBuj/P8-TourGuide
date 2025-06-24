@@ -22,7 +22,7 @@ package "TourGuide\nAPI" {
 }
 
 ' Util
-package "«Util»" {
+package "Util" {
 }
 
 ' Librairies
@@ -43,6 +43,6 @@ package "«librairie»" {
 [TourGuide\nAPI] ..> [RewardCentral] : Use
 [TourGuide\nAPI] ..> [TripPricer] : Use
 [Service] <--> [Model]
-[TourGuideService] ..> [«Util»]
+[TourGuideService] ..> [Util]
 
 @enduml

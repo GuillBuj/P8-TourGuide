@@ -12,7 +12,11 @@ public record NearbyAttractionDTO(
         double distance,
         int rewardPoints
 ) {
-    public NearbyAttractionDTO(Attraction attraction, VisitedLocation visitedLocation, double distance, int rewardPoints){
+    public NearbyAttractionDTO(
+            Attraction attraction,
+            VisitedLocation visitedLocation,
+            double distance,
+            int rewardPoints){
         this(
                 attraction.attractionName,
                 attraction.latitude,
