@@ -26,6 +26,14 @@ import gpsUtil.location.VisitedLocation;
 import tripPricer.Provider;
 import tripPricer.TripPricer;
 
+/**
+ * Service class for managing tour guide operations including user tracking, rewards calculation,
+ * and attraction recommendations.
+ *
+ * This service provides functionality to track user locations, calculate rewards,
+ * get nearby attractions, and manage trip deals. It supports both synchronous and
+ * asynchronous operations for better performance.
+ */
 @Service
 public class TourGuideService {
 	private Logger logger = LoggerFactory.getLogger(TourGuideService.class);
@@ -37,6 +45,12 @@ public class TourGuideService {
 
 	private final ExecutorService executor = Executors.newFixedThreadPool(100);
 
+	/**
+	 * Constructs a TourGuideService with dependencies.
+	 *
+	 * @param gpsUtil The GPS utility service for location tracking
+	 * @param rewardsService The service for reward calculations
+	 */
 	public TourGuideService(GpsUtil gpsUtil, RewardsService rewardsService) {
 		this.gpsUtil = gpsUtil;
 		this.rewardsService = rewardsService;
@@ -53,29 +67,63 @@ public class TourGuideService {
 		addShutDownHook();
 	}
 
+	/**
+	 * Gets all rewards for a user.
+	 *
+	 * @param user The user to get rewards for
+	 * @return List of user rewards
+	 */
 	public List<UserReward> getUserRewards(User user) {
 		return user.getUserRewards();
 	}
 
+	/**
+	 * Gets the user's last visited location or tracks a new location if none exists.
+	 *
+	 * @param user The user to get location for
+	 * @return The visited location
+	 */
 	public VisitedLocation getUserLocation(User user) {
         return (!user.getVisitedLocations().isEmpty()) ? user.getLastVisitedLocation()
                 : trackUserLocation(user);
 	}
 
+	/**
+	 * Gets a user by username.
+	 *
+	 * @param userName The username to search for
+	 * @return The User object or null if not found
+	 */
 	public User getUser(String userName) {
 		return internalUserMap.get(userName);
 	}
 
+	/**
+	 * Gets all users in the system.
+	 *
+	 * @return List of all users
+	 */
 	public List<User> getAllUsers() {
 		return internalUserMap.values().stream().collect(Collectors.toList());
 	}
 
+	/**
+	 * Adds a new user to the system if not already present.
+	 *
+	 * @param user The user to add
+	 */
 	public void addUser(User user) {
 		if (!internalUserMap.containsKey(user.getUserName())) {
 			internalUserMap.put(user.getUserName(), user);
 		}
 	}
 
+	/**
+	 * Gets trip deals for a user based on their preferences and reward points.
+	 *
+	 * @param user The user to get deals for
+	 * @return List of trip providers with deals
+	 */
 	public List<Provider> getTripDeals(User user) {
 		int cumulatativeRewardPoints = user.getUserRewards().stream().mapToInt(i -> i.getRewardPoints()).sum();
 		List<Provider> providers = tripPricer.getPrice(tripPricerApiKey, user.getUserId(),
@@ -85,6 +133,12 @@ public class TourGuideService {
 		return providers;
 	}
 
+	/**
+	 * Tracks a user's location synchronously and calculates rewards.
+	 *
+	 * @param user The user to track
+	 * @return The visited location
+	 */
 	public VisitedLocation trackUserLocation(User user) {
 		VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
 		user.addToVisitedLocations(visitedLocation);
@@ -92,6 +146,12 @@ public class TourGuideService {
 		return visitedLocation;
 	}
 
+	/**
+	 * Tracks a user's location asynchronously and calculates rewards.
+	 *
+	 * @param user The user to track
+	 * @return CompletableFuture containing the visited location
+	 */
 	public CompletableFuture<VisitedLocation> trackUserLocationAsync(User user) {
 		return CompletableFuture.supplyAsync(() -> {
 			VisitedLocation visitedLocation = gpsUtil.getUserLocation(user.getUserId());
@@ -104,6 +164,11 @@ public class TourGuideService {
 						.thenApply(ignore -> visitedLocation));
 	}
 
+	/**
+	 * Tracks locations for all users asynchronously.
+	 *
+	 * @param users List of users to track
+	 */
 	public void trackAllUsersLocationAsync(List<User> users) {
 		List<CompletableFuture<VisitedLocation>> futures = users.stream()
 				.map(this::trackUserLocationAsync)
@@ -112,6 +177,13 @@ public class TourGuideService {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 	}
 
+	/**
+	 * Gets nearby attractions for a visited location.
+	 *
+	 * @param visitedLocation The location to search around
+	 * @param user The user for reward point calculation
+	 * @return List of nearby attractions with details
+	 */
 	public List<NearbyAttractionDTO> getNearByAttractions(VisitedLocation visitedLocation, User user) {
 		return gpsUtil.getAttractions().stream()
 				.map(attraction -> Map.entry(
@@ -129,6 +201,9 @@ public class TourGuideService {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Adds a shutdown hook to stop tracking and shutdown executor service.
+	 */
 	private void addShutDownHook() {
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
 			tracker.stopTracking();
